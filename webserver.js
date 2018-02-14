@@ -4,7 +4,6 @@ url = require('url'),
 serverpublicDir = 'htdocs',
 path = require("path"),
 serverPort = 80;
-
 http.createServer(function(req, res){
 	clientId = req.socket.remoteAddress + ':'+ req.socket.remotePort;
 	console.log('[REQUEST]'+ clientId + ' ' + req.url);
