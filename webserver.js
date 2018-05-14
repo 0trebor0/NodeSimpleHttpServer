@@ -3,6 +3,7 @@ fs = require('fs'),
 url = require('url'),
 serverpublicDir = 'htdocs',
 path = require("path"),
+mime = require('mime-types'),
 serverPort = 80;
 
 http.createServer(function(req, res){
@@ -14,9 +15,11 @@ http.createServer(function(req, res){
 	} else{
 		if(fs.existsSync(serverpublicDir+req.url)){
 			if(fs.statSync(serverpublicDir+req.url).isFile()){
-				res.writeHead(200, {'Content-Type': 'text/html'});
+				//Is File
+				res.writeHead(200, {'Content-Type': mime.lookup(serverpublicDir+req.url)});
 				res.end(fs.readFileSync(serverpublicDir+req.url));
 			}else{
+				//Is Folder
 				var files = [];
 				fs.readdir(serverpublicDir+req.url, function(err, items){
 					for(var i=0; i < items.length; i++){
