@@ -5,7 +5,6 @@ serverpublicDir = 'htdocs',
 path = require("path"),
 mime = require('mime-types'),
 serverPort = 80;
-
 http.createServer(function(req, res){
 	clientId = req.socket.remoteAddress + ':'+ req.socket.remotePort;
 	console.log('[REQUEST]'+ clientId + ' ' + req.url);
