@@ -14,11 +14,17 @@ try{
         greenColour( "[REQUEST][IP: "+req.connection.remoteAddress+" ] "+req.url );
         let urlparsed = url.parse(req.url, true);
         let query = urlparsed.query;
-        if( urlparsed.pathname == '/'){
-            streamFile( res, htdocs+"/index.html" );
-        } else {
-            streamFile( res, htdocs+urlparsed.pathname );
-        }
+		if( fs.existsSync( htdocs+urlparsed.pathname ) ){
+			let fileStats = fs.statSync( htdocs+urlparsed.pathname );
+			if( fileStats.isDirectory() ){
+				streamFile( res, htdocs+urlparsed.pathname+"/index.html" );
+			} else {
+				streamFile( res, htdocs+urlparsed.pathname );
+			}
+		} else {
+			redColour( "File: "+urlparsed.pathname+" not found" );
+            notFound( res, urlparsed.pathname );
+		}
     } );
 }catch( err ){
     redColour( err );
@@ -30,17 +36,12 @@ redColour = ( text )=>{
     console.log("\x1b[31m",text);
 }
 streamFile = ( res, file )=>{
-    try{
-        if( fs.existsSync( file ) ){
-            let fileStream = fs.createReadStream( file );
-            fileStream.pipe( res );
-            fileStream.on('close', ()=>{
-                res.end();
-            });
-        } else {
-            redColour( "File: "+file+" not found" );
-            notFound( res, file );
-        }
+	try{
+		let fileStream = fs.createReadStream( file );
+		fileStream.pipe( res );
+		fileStream.on('close', ()=>{
+			res.end();
+		});
     }catch( err ){
         redColour( err );
         serverIternalServerError( res, err);
@@ -48,11 +49,11 @@ streamFile = ( res, file )=>{
 }
 notFound = ( res, file )=>{
     res.writeHead(404, {'Content-Type': 'text/html'});
-    res.write( "<center><h1>404 Not Found</h1><p>"+file+" not found</p></center>" );
+    res.write( "<head><title>404 not found</title></head><body><center><h1>404 Not Found</h1><p>"+file+" not found</p></center></body>" );
     res.end();
 }
 serverIternalServerError = ( res, error )=>{
     res.writeHead(500, {'Content-Type': 'text/html'});
-    res.write( "<center><h1>500 Internal Server Error<h1><p>"+error+"</p></center>" );
+    res.write( "<head><title>500 Internal Server Error</title></head><body><center><h1>500 Internal Server Error<h1><p>"+error+"</p></center></body>" );
     res.end();
 }
