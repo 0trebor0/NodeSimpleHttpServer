@@ -17,7 +17,11 @@ try{
 		if( fs.existsSync( htdocs+urlparsed.pathname ) ){
 			let fileStats = fs.statSync( htdocs+urlparsed.pathname );
 			if( fileStats.isDirectory() ){
-				streamFile( res, htdocs+urlparsed.pathname+"/index.html" );
+				if( fs.existsSync( htdocs+urlparsed.pathname+"/index.html" ) ){
+					streamFile( res, htdocs+urlparsed.pathname+"/index.html" );
+				} else {
+					notFound( res, "index.html" );
+				}
 			} else {
 				streamFile( res, htdocs+urlparsed.pathname );
 			}
